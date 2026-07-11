@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Generated datasets
+# Raw PDFs and extracted text are reproducible from the crawler/extraction
+# pipeline (src/crawler, src/extraction) and are large/binary, so they don't
+# belong in git history. documents.csv under data/processed/ IS tracked --
+# it's the small, final handoff artifact for the BERT and RAG teams.
+data/raw/
+data/extracted_text/
