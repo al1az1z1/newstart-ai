@@ -1,0 +1,29 @@
+# Core scientific / data stack, shared by notebooks, backend, and services.
+pandas
+numpy
+scikit-learn
+pydantic>=2
+pyyaml
+python-dotenv
+
+# BERT fine-tuning
+torch
+transformers
+datasets
+
+# LLM provider (Gemini is the default/only implementation for the MVP;
+# the code depends on the LLMProvider interface, not this package directly)
+google-genai
+
+# RAG
+chromadb
+
+# Backend (no database/auth for the MVP -- it reads stored research artifacts)
+fastapi
+uvicorn[standard]
+
+# Version 6 family-aware robustness research: deterministic English-language filtering
+# (Robustness_v6_Family_Aware_Chunked_BERT.md, Checkpoint 2). py3langid uses a fixed
+# pretrained model with no randomness and no network calls, so classification is exactly
+# reproducible -- required since the language audit must be deterministic and re-runnable.
+py3langid

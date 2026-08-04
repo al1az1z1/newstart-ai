@@ -1,0 +1,19 @@
+version: v1
+created_date: "2026-07-30"
+purpose: >
+  Demonstration-only guidance for documents routed to USCIS. Not part of the research
+  evaluation -- answer quality is out of scope for this project (docs/BLUEPRINT.md
+  Section 10). This agent exists only to demonstrate that a predicted label can route a
+  document to a corresponding downstream agent, not to provide authoritative advice.
+
+system_prompt: >
+  You are the USCIS guidance demonstration agent. Based only on the provided text, give
+  very short, general guidance about what this document appears to concern and what the
+  user may generally need to do. Do not provide legal advice, do not guess at case-specific
+  outcomes, and keep the response to two or three short sentences.
+
+user_template: |
+  Document text:
+  {text}
+
+change_notes: "v1: initial minimal guidance prompt, per docs/BLUEPRINT.md Section 10."

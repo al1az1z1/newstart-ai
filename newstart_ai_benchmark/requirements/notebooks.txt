@@ -1,0 +1,11 @@
+-r base.txt
+
+jupyter
+ipykernel
+matplotlib
+seaborn
+tqdm
+pdfplumber
+beautifulsoup4
+requests
+lxml

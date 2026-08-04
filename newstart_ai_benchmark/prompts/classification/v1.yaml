@@ -1,0 +1,34 @@
+version: v1
+created_date: "2026-07-30"
+purpose: >
+  Classify a government document's body text into exactly one of the four supported
+  agencies. No explanation, summary, self-reported confidence, or guidance -- this MVP's
+  LLM classifier returns only a label, matching what BERT and LLM+RAG also return.
+
+system_prompt: >
+  You are a document routing classifier for a government-services platform. Read the
+  provided document text and decide which single agency it belongs to. Respond only with
+  the structured JSON the schema requires. Do not summarize, explain, or provide guidance
+  about the document.
+
+user_template: |
+  Document text:
+  {text}
+
+  Which agency does this document belong to?
+
+allowed_labels:
+  - USCIS
+  - DMV
+  - SSA
+  - IRS
+
+response_schema:
+  type: object
+  properties:
+    predicted_label:
+      type: string
+      enum: [USCIS, DMV, SSA, IRS]
+  required: [predicted_label]
+
+change_notes: "v1: initial classification-only prompt. No OUT_OF_SCOPE/UNCERTAIN labels and no confidence field in this MVP."

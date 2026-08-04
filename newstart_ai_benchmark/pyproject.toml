@@ -1,0 +1,23 @@
+[project]
+name = "newstart-ai-benchmark"
+version = "0.1.0"
+description = "Reproducible benchmark comparing BERT, LLM routing, and LLM+RAG routing for government-agency document classification."
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "backend/tests"]
+pythonpath = ["src"]
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100

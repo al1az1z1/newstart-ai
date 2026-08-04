@@ -1,0 +1,9 @@
+# Routing RAG configuration. Built from the training split only; never indexes test.csv.
+
+vector_store: chromadb
+persist_dir: artifacts/vector_stores/routing_index
+embedding_provider: gemini
+embedding_model: gemini-embedding-001
+top_k: 5
+prompt_version: v1
+classification_prompt_path: prompts/rag_classification/v1.yaml

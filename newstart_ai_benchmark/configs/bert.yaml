@@ -1,0 +1,12 @@
+# BERT fine-tuning configuration for the single MVP experiment.
+
+base_model: bert-base-uncased
+max_epochs: 6
+batch_size: 8
+learning_rate: 2e-5
+checkpoint_selection_metric: validation_macro_f1
+
+imbalance:
+  # majority:minority training-set ratio above which weighted cross-entropy is used
+  weighted_loss_threshold: 4.0
+  # class weights are computed from the training split only, never validation/test

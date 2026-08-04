@@ -1,0 +1,19 @@
+# LLM provider configuration. Gemini is the default/only implementation for the MVP;
+# the LLMProvider interface is what everything else depends on, not the Gemini SDK directly.
+# Swapping provider/model (e.g. to OpenAI/Claude, or a newer Gemini model) is a config change
+# here plus a new adapter class -- never a rewrite of the code that calls LLMProvider.
+
+provider: gemini
+model: gemini-3.6-flash
+api_key_env: GEMINI_API_KEY   # name of the env var holding the key, never the key itself
+endpoint: null                # optional override; null uses the provider SDK's default
+prompt_version: v1
+classification_prompt_path: prompts/classification/v1.yaml
+rag_classification_prompt_path: prompts/rag_classification/v1.yaml
+guidance_prompt_dir: prompts/agency_guidance
+
+# One additional validation-set evaluation pass (see docs/BLUEPRINT.md Section 4) is used
+# only to compute a validation macro F1 comparable to BERT's -- never to pick the final
+# test-set comparison result.
+validation_pass:
+  enabled: true

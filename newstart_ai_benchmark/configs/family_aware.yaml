@@ -1,0 +1,256 @@
+# Version 6 family-aware chunked BERT robustness research
+# (Robustness_v6_Family_Aware_Chunked_BERT.md).
+#
+# This file is additive and fully separate from base.yaml/bert.yaml/llm.yaml/rag.yaml -- it
+# never changes the historical MVP's dataset, split, BERT artifact, LLM settings, or RAG
+# index. All outputs produced using this config are written to new artifacts/family_aware/
+# and data/family_aware_* paths, never overwriting historical files.
+#
+# Checkpoints 2-4 scope: English filtering, family discovery, and the family-aware split.
+# Chunking, aggregation, partial-selection, and identifier-masking settings are added as new
+# top-level sections in later checkpoints -- not included here yet.
+
+language_filter:
+  detector_name: py3langid
+  # py3langid classifies text using a fixed, pretrained Naive Bayes model with no random
+  # initialization and no external network calls, so identical input text always produces
+  # identical output -- verified directly (see tests/test_language_filter.py).
+  target_language: en
+
+  # Below this many characters, detection is treated as unreliable regardless of the
+  # detector's own confidence score. Verified experimentally: py3langid returns the same
+  # low "no real signal" confidence (~0.169) for empty text, single words, and short
+  # numeric/form-code fragments alike.
+  min_text_length: 30
+
+  # Documents whose non-whitespace characters are mostly non-alphabetic (form codes, page
+  # numbers, numeric tables) are flagged as uncertain rather than trusted to the detector,
+  # which cannot make a meaningful language judgment without real word content.
+  min_alphabetic_ratio: 0.5
+
+  # A document is classified as "confidently" English or non-English only when the
+  # detector's normalized top-language probability meets this threshold. Symmetric by
+  # design -- the same bar applies whether the top language is English or not.
+  confident_english_threshold: 0.90
+  confident_non_english_threshold: 0.90
+
+  # Mixed-language check: the document is split into this many roughly-equal windows (by
+  # character position) and each window is classified independently. If every window meets
+  # min_text_length but they disagree on the top-ranked language, the whole document is
+  # flagged uncertain/mixed rather than trusted to whichever language the combined text
+  # happens to statistically favor. Verified experimentally: a 50/50 English/Spanish
+  # document was misclassified as "confidently English" (0.9995 confidence) by
+  # whole-document detection alone -- window-level disagreement catches this.
+  mixed_language_window_count: 2
+
+split:
+  # Approximate document-level targets -- family integrity and agency coverage take
+  # priority over hitting these exactly (Checkpoint 4). Applies to the ELIGIBLE corpus
+  # (final_modeling_eligibility == include_english_corpus) only, grouped by
+  # effective_family_id, never by the original family_id or individual document.
+  train: 0.70
+  validation: 0.15
+  test: 0.15
+  # Reused from the historical MVP split for consistency; also used to seed deterministic
+  # tie-breaking when families of equal size compete for the same split slot.
+  random_seed: 42
+  output_dir: data/family_aware_splits
+
+chunking:
+  # Checkpoint 5: tokenizer-aware chunking of the frozen family-aware splits. The tokenizer
+  # *name* is intentionally not repeated here -- it is read from configs/bert.yaml's
+  # bert.base_model so this config can never silently drift from the classifier it feeds.
+  # A pinned revision (rather than "latest") keeps re-tokenization reproducible even if the
+  # upstream model card is ever updated.
+  tokenizer_revision: main
+
+  # BERT's actual maximum input length (bert-base-uncased's model_max_length). Read from
+  # config, not hardcoded, so a different base model's limit is a config change only.
+  max_seq_length: 512
+
+  # [CLS] + [SEP] added when a chunk is encoded for the model (single-segment classification
+  # input, tokenizer.num_special_tokens_to_add(pair=False) == 2 for BERT).
+  num_special_tokens: 2
+
+  # Overlapping content tokens shared between two consecutive windows of the same long
+  # document, so the model sees some shared context across chunk boundaries rather than
+  # disjoint, context-free fragments.
+  chunk_overlap_tokens: 128
+
+  # Bumped whenever the windowing algorithm itself changes, so chunk_id (which embeds this
+  # version) can never conflate chunks produced under different rules.
+  chunking_policy_version: v1
+
+  output_dir: data/family_aware_chunks
+
+aggregation:
+  # Checkpoint 6: converts chunk-level model outputs into one document-level prediction.
+  # `default_method` is PROVISIONAL -- frozen here via deterministic/mathematical
+  # justification and the validation split's real chunk-count structure only (the historical
+  # bert-mvp model cannot be used to compute a real validation macro F1 for this choice: 65.7%
+  # of the new family-aware validation documents were in that model's own training set, which
+  # would make any such comparison contaminated/optimistic, not a real signal). Re-confirmed
+  # empirically with real, uncontaminated validation macro F1 in Checkpoint 7 once the new
+  # family-aware BERT is trained on the family-aware train split.
+  default_method: mean_probabilities
+  candidate_methods:
+    - mean_logits
+    - mean_probabilities
+    - majority_vote
+    - max_confidence
+  # Deterministic majority-vote tie-break, applied in order until a unique winner remains:
+  # (1) highest summed probability across chunks among the tied labels, (2) lowest index in
+  # base.labels. Both steps are content-derived or config-derived -- never random.
+  tie_breaker: highest_summed_probability_then_label_order
+  policy_version: v1
+
+document_balancing:
+  # Checkpoint 6: prevents documents with many chunks (e.g. document 739 -> 519 chunks) from
+  # dominating the training loss relative to ordinary short documents. Separate from agency
+  # class weighting (base.bert imbalance settings), which must be computed from eligible
+  # TRAINING DOCUMENT counts, never chunk counts.
+  method: inverse_chunk_count_weight
+  policy_version: v1
+
+partial_input:
+  # Checkpoint 6: deterministic partial-document conditions built from each document's
+  # already-frozen, ordered chunk sequence (Checkpoint 5) -- never re-derived from raw text
+  # or test data. One chunk represents each region; middle_index = total_chunks // 2 (a
+  # documented, deterministic choice -- for 2-chunk documents this coincides with the end
+  # chunk, and for 1-chunk documents all three regions coincide with the only chunk. Both
+  # cases are recorded as an explicit fallback in the manifest, never silently duplicated).
+  chunks_per_region: 1
+  policy_version: v1
+
+masking:
+  # Checkpoint 6: narrow, reproducible identifier masking targeting explicit routing
+  # shortcuts only (agency names/abbreviations, form numbers, OMB control numbers, .gov
+  # URLs) -- never ordinary semantic content. Rules were authored from domain knowledge of
+  # these four agencies' real letterhead/footer conventions, never by inspecting test
+  # documents or test outcomes. Applied identically regardless of a document's own label, so
+  # the same deterministic function produces the same output for BERT, LLM, and LLM+RAG
+  # evaluation inputs.
+  policy_version: v1
+  agency_name_placeholder: "[AGENCY_NAME]"
+  form_number_placeholder: "[FORM_NUMBER]"
+  omb_number_placeholder: "[OMB_NUMBER]"
+  url_placeholder: "[AGENCY_URL]"
+  agency_identifier_phrases:
+    USCIS:
+      - "United States Citizenship and Immigration Services"
+      - "U.S. Citizenship and Immigration Services"
+      - "Citizenship and Immigration Services"
+      - "Department of Homeland Security"
+      - "USCIS"
+      - "DHS"
+    DMV:
+      - "Department of Motor Vehicles"
+      - "Division of Motor Vehicles"
+      - "DMV"
+    SSA:
+      - "Social Security Administration"
+      - "SSA"
+    IRS:
+      - "Internal Revenue Service"
+      - "Department of the Treasury"
+      - "IRS"
+  output_dir: data/family_aware_masked
+
+training:
+  # Checkpoint 7: the new family-aware chunked BERT. base_model/tokenizer_revision are
+  # intentionally not repeated here -- read from configs/bert.yaml and this file's own
+  # chunking.tokenizer_revision so training can never silently target a different model or
+  # tokenizer than the one that produced these frozen chunks.
+  max_epochs: 6
+  batch_size: 8
+  learning_rate: 2e-5
+  random_seed: 42
+  checkpoint_selection_metric: validation_macro_f1
+  # Aggregation used to convert validation chunk predictions into a document-level score for
+  # PER-EPOCH checkpoint selection only -- the provisional default from Checkpoint 6. The
+  # final aggregation method for reporting is reconfirmed once, after training, by comparing
+  # all four frozen alternatives on the selected best checkpoint (Checkpoint 7 requirement 6).
+  checkpoint_selection_aggregation_method: mean_probabilities
+  imbalance:
+    # Same formula/threshold convention as configs/bert.yaml, applied to eligible TRAINING
+    # DOCUMENT counts (never chunk counts) -- computed independently of the historical
+    # model's class weights, which were computed over the historical (non-family-aware) split.
+    weighted_loss_threshold: 4.0
+  output_dir: artifacts/family_aware/models
+
+conditions:
+  # Checkpoint 6: the shared evaluation-condition registry so BERT, LLM, and LLM+RAG
+  # evaluations (Checkpoint 7+) all consume the identical document_id -> condition -> text
+  # mapping -- no method ever silently receives different text for the same condition.
+  policy_version: v1
+  names:
+    - complete_unmasked
+    - beginning_only_unmasked
+    - middle_only_unmasked
+    - end_only_unmasked
+    - beginning_middle_end_unmasked
+    - complete_masked
+    - beginning_only_masked
+    - middle_only_masked
+    - end_only_masked
+    - beginning_middle_end_masked
+  output_dir: data/family_aware_conditions
+
+rag:
+  # Checkpoint 9: family-aware retrieval layer. embedding_provider/embedding_model are
+  # intentionally not repeated here -- read from configs/rag.yaml so this can never silently
+  # target a different embedding model than the historical index without an explicit config
+  # change in one place.
+  document_task_type: RETRIEVAL_DOCUMENT
+  query_task_type: RETRIEVAL_QUERY
+  # null = model default (no output_dimensionality truncation) -- gemini-embedding-001's
+  # default dimensionality is used as-is, matching the historical index's behavior.
+  output_dimensionality: null
+  embedding_batch_size: 10
+  max_retries: 5
+  retry_backoff_seconds: 2.0
+  cache_dir: artifacts/family_aware/embedding_cache
+  persist_dir_unmasked: artifacts/family_aware/vector_stores/routing_index_unmasked
+  persist_dir_masked: artifacts/family_aware/vector_stores/routing_index_masked
+  policy_version: v1
+
+  retrieval:
+    # Frozen via validation-only retrieval diagnostics (Checkpoint 9, requirement 6) --
+    # provisional candidate values below, confirmed/adjusted once diagnostics are computed.
+    candidate_pool_size: 20
+    top_k: 5
+    similarity_metric: cosine
+    # Long-document domination guard (document 739 has 519 training chunks): no single
+    # parent document or effective family may occupy more than this many of the final top_k
+    # positions.
+    max_chunks_per_parent_document: 2
+    max_results_per_effective_family: 2
+    minimum_similarity_threshold: null
+    tie_breaker: higher_similarity_then_deterministic_chunk_id_hash
+    policy_version: v1
+
+evaluation:
+  # Checkpoint 10: the one-time frozen head-to-head test evaluation (BERT vs. plain Gemini
+  # LLM vs. Gemini LLM+RAG). llm provider/model/base classification prompt are intentionally
+  # not repeated here -- reused verbatim from configs/llm.yaml, which is already appropriate
+  # (label-only structured output, no confidence/OUT_OF_SCOPE labels) and was not tuned for
+  # this checkpoint.
+  family_aware_rag_classification_prompt_path: prompts/rag_classification/family_aware_v1.yaml
+  max_attempts: 3
+  retry_backoff_seconds: 2.0
+  # Only retried: transient transport/timeout/rate-limit/server errors. A parsed-but-invalid
+  # label, a refusal, or a schema-repair need is recorded as invalid/failed, never retried in
+  # the hope of a "better" answer -- retrying to chase a different class label is explicitly
+  # forbidden by the frozen failure policy.
+  retryable_error_substrings:
+    - timeout
+    - rate limit
+    - "429"
+    - "500"
+    - "503"
+    - deadline exceeded
+    - connection
+    - unavailable
+  cache_dir: artifacts/family_aware/llm_eval_cache
+  output_dir: artifacts/family_aware/reports
+  policy_version: v1

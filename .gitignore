@@ -216,3 +216,73 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+
+# Generated datasets
+# Raw PDFs and extracted text are reproducible from the crawler/extraction
+# pipeline (src/crawler, src/extraction) and are large/binary, so they don't
+# belong in git history. documents.csv under data/processed/ IS tracked --
+# it's the small, final handoff artifact for the BERT and RAG teams.
+data/raw/
+data/extracted_text/
+
+# Node / frontend (newstart_ai_benchmark/frontend)
+node_modules/
+
+# Generated per-text embedding cache; keep locally, do not commit
+newstart_ai_benchmark/artifacts/family_aware/embedding_cache/
+
+# Paid API evaluation caches — local and reproducible
+newstart_ai_benchmark/artifacts/family_aware/llm_eval_cache/
+newstart_ai_benchmark/docs/NewStart AI Demo_10 Conditions .pdf
+newstart_ai_benchmark/docs/NewStart AI Demo_random 10 condition_one random as test.pdf
+newstart_ai_benchmark/notebooks/00_data_acquisition/01_uscis_crawler.pdf
+newstart_ai_benchmark/notebooks/00_data_acquisition/03_irs_crawler.pdf
+newstart_ai_benchmark/notebooks/00_data_acquisition/04_ssa_crawler.pdf
+newstart_ai_benchmark/notebooks/00_data_acquisition/02_agency_crawler.pdf
+newstart_ai_benchmark/notebooks/00_data_acquisition/06_raw_corpus_eda.pdf
+newstart_ai_benchmark/notebooks/00_data_acquisition/05_build_dataset.pdf
+
+
+
+# Generated trained models
+newstart_ai_benchmark/artifacts/models/
+newstart_ai_benchmark/artifacts/family_aware/models/
+
+# Generated vector databases
+newstart_ai_benchmark/artifacts/vector_stores/
+newstart_ai_benchmark/artifacts/family_aware/vector_stores/
+
+# manifest files for trained models and vector databases
+newstart_ai_benchmark/artifacts/family_aware/manifests
+newstart_ai_benchmark/artifacts/manifests
+
+#artifacts 
+newstart_ai_benchmark/artifacts/
+
+
+# family-aware data 
+newstart_ai_benchmark/data/family_aware_splits
+newstart_ai_benchmark/data/family_aware_conditions
+newstart_ai_benchmark/data/family_aware_masked
+newstart_ai_benchmark/data/metadata
+newstart_ai_benchmark/data/splits
+
+# app
+newstart_ai_benchmark/backend
+newstart_ai_benchmark/frontend
+
+
+
+
+
+
+
+
+# Reproducible condition-training artifact
+newstart_ai_benchmark/data/family_aware_conditions/condition_registry_train_validation.csv
+
+# Reproducible chunk-level datasets
+newstart_ai_benchmark/data/family_aware_chunks/
+newstart_ai_benchmark/data/family_aware_masked/*_chunks.csv

@@ -1,0 +1,24 @@
+dataset:
+  path: data/processed/final_dataset.csv
+  id_column: document_id
+  text_column: text
+  label_column: agency
+labels:
+- USCIS
+- DMV
+- SSA
+- IRS
+split:
+  train: 0.64
+  validation: 0.16
+  test: 0.2
+  random_seed: 42
+  output_dir: data/splits
+long_document_strategy:
+  default: first_512
+  max_tokens: 512
+  beginning_middle_end:
+    max_chunks: 3
+    chunk_overlap_tokens: 32
+demo:
+  default_routing_method: bert

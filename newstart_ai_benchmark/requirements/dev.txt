@@ -1,0 +1,9 @@
+-r base.txt
+
+pytest
+pytest-cov
+pytest-asyncio
+httpx
+black
+ruff
+mypy
