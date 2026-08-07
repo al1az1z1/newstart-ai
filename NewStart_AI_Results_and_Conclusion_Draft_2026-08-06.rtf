@@ -1,0 +1,178 @@
+{\rtf1\ansi\ansicpg1252\deff0
+{\fonttbl{\f0 Times New Roman;}{\f1 Arial;}}
+{\colortbl;\red0\green0\blue0;\red31\green78\blue121;\red242\green244\blue247;\red89\green89\blue89;}
+{\stylesheet
+{\s0\qj\widctlpar\sl320\slmult1\sa160\f0\fs24 Normal;}
+{\s1\keepn\sb360\sa200\f0\fs32\b Heading 1;}
+{\s2\keepn\sb240\sa120\f0\fs26\b Heading 2;}
+{\s3\keepn\sb160\sa80\f0\fs24\b Heading 3;}
+{\s4\qc\sa160\f0\fs22\i Caption;}
+{\s5\ql\sa100\f0\fs20\i Figure Placeholder;}
+{\s6\ql\sa80\f0\fs20\i Table Note;}
+}
+\paperw12240\paperh15840\margl1440\margr1440\margt1440\margb1440\headery708\footery708\widowctrl
+
+\pard\qc\sa100\f0\fs32\b NewStart AI\par
+\pard\qc\sa260\f0\fs28\b Results and Conclusion Draft\par
+\pard\qc\sa320\f0\fs20\i Prepared for integration into the final capstone report\par
+
+\pard\s1 5\tab Results\par
+
+\pard\s0 The primary evaluation compared the fine-tuned BERT classifier, the prompted Gemini large language model, and Gemini with retrieval-augmented generation (LLM+RAG) on the same 99 frozen, family-disjoint test documents. Each document was evaluated under ten registered text conditions, producing 990 predictions per method and 2,970 evaluation cases in total. Macro F1 was the primary metric because the four agencies were unevenly represented and the IRS test subset contained only four documents. Accuracy, macro precision, macro recall, errors, latency, and API usage were used as supporting measures. The family-aware study is reported as the primary result; the earlier 151-document experiment is included only as historical context because it used a different test population and did not enforce family-disjoint splitting.\par
+
+\pard\s2 5.1\tab BERT Training and Checkpoint Selection\par
+
+\pard\s0 BERT learned the four-agency classification task rapidly. Validation macro F1 increased from 0.9907 after the first epoch to 1.0000 after the second epoch. Although the same maximum score was also observed at epochs 3, 4, and 6, epoch 2 was retained under the predefined tie rule selecting the earliest checkpoint with the highest validation macro F1. Epoch 2 also had the lowest validation loss, 0.012386. All six planned epochs were completed; the later validation fluctuation, particularly the reduction in macro F1 at epoch 5, supports the decision to select the earlier checkpoint instead of the final epoch.\par
+
+\pard\s4 Table 3. Family-aware BERT training and validation history.\par
+\trowd\trgaph80\trleft120\trhdr
+\clcbpat3\cellx920\clcbpat3\cellx3020\clcbpat3\cellx5120\clcbpat3\cellx9480
+\pard\intbl\qc\b\fs20 Epoch\cell
+\pard\intbl\qc\b\fs20 Training loss\cell
+\pard\intbl\qc\b\fs20 Validation loss\cell
+\pard\intbl\qc\b\fs20 Validation macro F1\cell\row
+\trowd\trgaph80\trleft120\cellx920\cellx3020\cellx5120\cellx9480
+\pard\intbl\qc\fs20 1\cell\pard\intbl\qc\fs20 0.293084\cell\pard\intbl\qc\fs20 0.036008\cell\pard\intbl\qc\fs20 0.990713\cell\row
+\trowd\trgaph80\trleft120\cellx920\cellx3020\cellx5120\cellx9480
+\pard\intbl\qc\fs20 2\cell\pard\intbl\qc\fs20 0.033180\cell\pard\intbl\qc\fs20 0.012386\cell\pard\intbl\qc\fs20 1.000000\cell\row
+\trowd\trgaph80\trleft120\cellx920\cellx3020\cellx5120\cellx9480
+\pard\intbl\qc\fs20 3\cell\pard\intbl\qc\fs20 0.004709\cell\pard\intbl\qc\fs20 0.025930\cell\pard\intbl\qc\fs20 1.000000\cell\row
+\trowd\trgaph80\trleft120\cellx920\cellx3020\cellx5120\cellx9480
+\pard\intbl\qc\fs20 4\cell\pard\intbl\qc\fs20 0.018083\cell\pard\intbl\qc\fs20 0.026226\cell\pard\intbl\qc\fs20 1.000000\cell\row
+\trowd\trgaph80\trleft120\cellx920\cellx3020\cellx5120\cellx9480
+\pard\intbl\qc\fs20 5\cell\pard\intbl\qc\fs20 0.017587\cell\pard\intbl\qc\fs20 0.056275\cell\pard\intbl\qc\fs20 0.990563\cell\row
+\trowd\trgaph80\trleft120\cellx920\cellx3020\cellx5120\cellx9480
+\pard\intbl\qc\fs20 6\cell\pard\intbl\qc\fs20 0.009330\cell\pard\intbl\qc\fs20 0.022930\cell\pard\intbl\qc\fs20 1.000000\cell\row
+
+\pard\s5 [Insert Figure 4 here. Create a three-series learning-curve figure from the frozen epoch values in Table 3: training loss and validation loss by epoch on the left vertical axis, and validation macro F1 on the right vertical axis. Mark epoch 2 with a vertical dashed line labeled "Selected checkpoint." Plot epochs 1 through 6 only; do not include test metrics.]\par
+\pard\s4 Figure 4. Family-aware BERT training and validation behavior across six epochs. Epoch 2 was selected as the earliest checkpoint attaining the maximum validation macro F1.\par
+
+\pard\s2 5.2\tab Primary Complete-Document Performance\par
+
+\pard\s0 Under the primary complete_unmasked condition, all three methods correctly classified all 99 test documents. Accuracy, macro precision, macro recall, and macro F1 were therefore 1.0000 for BERT, plain Gemini, and Gemini+RAG. The corresponding confusion matrices were fully diagonal, with no misclassification for any of the four agencies. This result shows that each architecture was capable of routing complete documents from unseen document families when all original textual evidence was available. However, the perfect score should be interpreted as a ceiling result for this specific test set, not as proof of perfect performance on future government documents.\par
+
+\pard\s4 Table 4. Performance on the primary complete_unmasked condition (99 documents per method).\par
+\trowd\trgaph80\trleft120\trhdr
+\clcbpat3\cellx2880\clcbpat3\cellx5080\clcbpat3\cellx7280\clcbpat3\cellx9480
+\pard\intbl\ql\b\fs20 Metric\cell
+\pard\intbl\qc\b\fs20 BERT\cell
+\pard\intbl\qc\b\fs20 Plain Gemini\cell
+\pard\intbl\qc\b\fs20 Gemini+RAG\cell\row
+\trowd\trgaph80\trleft120\cellx2880\cellx5080\cellx7280\cellx9480
+\pard\intbl\ql\fs20 Accuracy\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx2880\cellx5080\cellx7280\cellx9480
+\pard\intbl\ql\fs20 Macro precision\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx2880\cellx5080\cellx7280\cellx9480
+\pard\intbl\ql\fs20 Macro recall\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx2880\cellx5080\cellx7280\cellx9480
+\pard\intbl\ql\fs20 Macro F1\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+
+\pard\s2 5.3\tab Robustness Across Registered Text Conditions\par
+
+\pard\s0 The robustness conditions produced the clearest difference among the methods. Plain Gemini and Gemini+RAG achieved a macro F1 of 1.0000 under all ten conditions, including partial-document inputs and versions in which explicit agency names, form numbers, government URLs, and related identifiers were masked. BERT achieved 1.0000 in five conditions and remained above 0.95 in every condition, but its performance declined when some textual evidence was removed. Its lowest macro F1 was 0.9587 for beginning-only unmasked text. The other non-perfect BERT scores were 0.9910 for end-only unmasked, 0.9664 for complete masked, 0.9664 for beginning-only masked, and 0.9842 for end-only masked. These results indicate that BERT was highly accurate but more sensitive than the LLM approaches to where evidence appeared and to the removal of explicit identifiers.\par
+
+\pard\s4 Table 5. Macro F1 across the ten family-aware robustness conditions.\par
+\trowd\trgaph80\trleft120\trhdr
+\clcbpat3\cellx4080\clcbpat3\cellx5880\clcbpat3\cellx7680\clcbpat3\cellx9480
+\pard\intbl\ql\b\fs20 Condition\cell
+\pard\intbl\qc\b\fs20 BERT\cell
+\pard\intbl\qc\b\fs20 Plain Gemini\cell
+\pard\intbl\qc\b\fs20 Gemini+RAG\cell\row
+\trowd\trgaph80\trleft120\cellx4080\cellx5880\cellx7680\cellx9480
+\pard\intbl\ql\fs20 complete_unmasked\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx4080\cellx5880\cellx7680\cellx9480
+\pard\intbl\ql\fs20 beginning_only_unmasked\cell\pard\intbl\qc\fs20 0.9587\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx4080\cellx5880\cellx7680\cellx9480
+\pard\intbl\ql\fs20 middle_only_unmasked\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx4080\cellx5880\cellx7680\cellx9480
+\pard\intbl\ql\fs20 end_only_unmasked\cell\pard\intbl\qc\fs20 0.9910\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx4080\cellx5880\cellx7680\cellx9480
+\pard\intbl\ql\fs20 beginning_middle_end_unmasked\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx4080\cellx5880\cellx7680\cellx9480
+\pard\intbl\ql\fs20 complete_masked\cell\pard\intbl\qc\fs20 0.9664\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx4080\cellx5880\cellx7680\cellx9480
+\pard\intbl\ql\fs20 beginning_only_masked\cell\pard\intbl\qc\fs20 0.9664\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx4080\cellx5880\cellx7680\cellx9480
+\pard\intbl\ql\fs20 middle_only_masked\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx4080\cellx5880\cellx7680\cellx9480
+\pard\intbl\ql\fs20 end_only_masked\cell\pard\intbl\qc\fs20 0.9842\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+\trowd\trgaph80\trleft120\cellx4080\cellx5880\cellx7680\cellx9480
+\pard\intbl\ql\fs20 beginning_middle_end_masked\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\pard\intbl\qc\fs20 1.0000\cell\row
+
+\pard\s5 [Insert Figure 5 here. Create a grouped macro-F1 bar chart from Table 5. Use the ten conditions on the horizontal axis and three bars per condition in this order: BERT, Plain Gemini, and Gemini+RAG. Display values to four decimal places, use a clearly labeled vertical axis from 0.95 to 1.00 so the small BERT differences remain visible, and state in the caption that the axis is truncated. Keep masked and unmasked conditions visually distinguishable through label grouping or a subtle divider.]\par
+\pard\s4 Figure 5. Macro F1 for BERT, plain Gemini, and Gemini+RAG across ten registered text conditions. The vertical axis is truncated to show small differences near 1.00.\par
+
+\pard\s2 5.4\tab Error Analysis and Long-Input Behavior\par
+
+\pard\s0 The BERT errors were concentrated in the conditions that removed or limited available evidence rather than in complete unmasked documents. The saved error artifacts include an IRS W-4V document classified as SSA from its unmasked beginning, an SSA-3373-BK document classified as DMV from its ending, and an SSA-1694 document classified as IRS under complete-masked and beginning-only-masked inputs. These examples suggest that short sections containing generic administrative language may not preserve enough agency-specific context for the task-specific encoder. Because only four IRS documents were present in the test partition, a single IRS error also had a comparatively large effect on macro F1.\par
+
+\pard\s0 The plain LLM and LLM+RAG pipelines each truncated 242 inputs that exceeded the 6,000-character limit, and every truncated case in this evaluation was still classified correctly. This observation indicates that the retained beginning text was sufficient for these documents, but it does not establish that truncation is harmless for other datasets or document types. No invalid outputs, failed responses, or retries were recorded for either API-based method.\par
+
+\pard\s2 5.5\tab RAG Contribution, Runtime, and Cost\par
+
+\pard\s0 Gemini and Gemini+RAG generated identical predictions for all 990 document-condition pairs. RAG therefore changed zero predictions and produced no measurable classification improvement in this evaluation. Because both approaches reached the performance ceiling, this finding does not show that retrieval is generally ineffective; it shows only that retrieved context was unnecessary for these four-agency test cases. The training-only RAG stores contained 4,300 unmasked and 4,300 masked chunks. Validation diagnostics showed that retrieval diversification reduced the mean share of results contributed by the most dominant parent document from 52.7% to 38.4%, and provenance checks confirmed that masked and unmasked conditions used their intended indexes.\par
+
+\pard\s0 The additional retrieval context increased prompt-token use, latency, and estimated cost without altering classification. Plain Gemini averaged 1,648 ms per case, compared with 1,783 ms for Gemini+RAG. RAG used more than four times as many prompt tokens and had a higher estimated generation cost. Query embeddings added an estimated $0.1127, bringing the combined estimated cost of the two API experiments to approximately $0.6893. These values are analytical estimates from the saved artifacts and may not equal final billed charges.\par
+
+\pard\s4 Table 6. Operational results for the family-aware API-based evaluations.\par
+\trowd\trgaph80\trleft120\trhdr
+\clcbpat3\cellx4680\clcbpat3\cellx7080\clcbpat3\cellx9480
+\pard\intbl\ql\b\fs20 Measure\cell
+\pard\intbl\qc\b\fs20 Plain Gemini\cell
+\pard\intbl\qc\b\fs20 Gemini+RAG\cell\row
+\trowd\trgaph80\trleft120\cellx4680\cellx7080\cellx9480
+\pard\intbl\ql\fs20 Successful cases\cell\pard\intbl\qc\fs20 990/990\cell\pard\intbl\qc\fs20 990/990\cell\row
+\trowd\trgaph80\trleft120\cellx4680\cellx7080\cellx9480
+\pard\intbl\ql\fs20 Mean latency (ms)\cell\pard\intbl\qc\fs20 1,648\cell\pard\intbl\qc\fs20 1,783\cell\row
+\trowd\trgaph80\trleft120\cellx4680\cellx7080\cellx9480
+\pard\intbl\ql\fs20 Median latency (ms)\cell\pard\intbl\qc\fs20 1,579\cell\pard\intbl\qc\fs20 1,708\cell\row
+\trowd\trgaph80\trleft120\cellx4680\cellx7080\cellx9480
+\pard\intbl\ql\fs20 95th-percentile latency (ms)\cell\pard\intbl\qc\fs20 2,203\cell\pard\intbl\qc\fs20 2,442\cell\row
+\trowd\trgaph80\trleft120\cellx4680\cellx7080\cellx9480
+\pard\intbl\ql\fs20 Prompt tokens\cell\pard\intbl\qc\fs20 871,634\cell\pard\intbl\qc\fs20 3,620,336\cell\row
+\trowd\trgaph80\trleft120\cellx4680\cellx7080\cellx9480
+\pard\intbl\ql\fs20 Completion tokens\cell\pard\intbl\qc\fs20 8,577\cell\pard\intbl\qc\fs20 9,791\cell\row
+\trowd\trgaph80\trleft120\cellx4680\cellx7080\cellx9480
+\pard\intbl\ql\fs20 Estimated generation cost\cell\pard\intbl\qc\fs20 $0.1457\cell\pard\intbl\qc\fs20 $0.4310\cell\row
+\trowd\trgaph80\trleft120\cellx4680\cellx7080\cellx9480
+\pard\intbl\ql\fs20 Invalid outputs / failures / retries\cell\pard\intbl\qc\fs20 0 / 0 / 0\cell\pard\intbl\qc\fs20 0 / 0 / 0\cell\row
+\pard\s6 Note. The RAG evaluation also incurred an estimated $0.1127 for 823 unique query embeddings. Costs are estimates based on saved usage records.\par
+
+\pard\s2 5.6\tab Historical Context and Application Experience\par
+
+\pard\s0 In the historical 151-document experiment, BERT achieved 0.9934 accuracy and 0.9741 macro F1, while plain Gemini and Gemini+RAG each achieved 0.9868 accuracy and 0.9694 macro F1. Mean latency was 16.4 ms for BERT, 1,507.9 ms for Gemini, and 1,555.8 ms for Gemini+RAG. These scores should not be interpreted as showing improvement or decline relative to the family-aware experiment. The historical and primary experiments used different test documents and different leakage controls; a subsequent audit found that 62 of 90 non-singleton document families in the historical data crossed partition boundaries, compared with zero family overlap in the family-aware split.\par
+
+\pard\s0 The application demonstrates the results at three levels. The family-aware whole-test page summarizes the frozen 99-document evaluation, and the family-aware single-document page replays saved predictions across the ten conditions without making new Gemini or embedding calls. The earlier interactive prototype demonstrates the end-to-end concept by classifying an input, routing it to an agency-specific preliminary agent, and returning a short guidance response. The guidance response was not formally evaluated for factual correctness, safety, or usefulness, so the application evidence supports the feasibility of routing but not the quality of downstream advice. The approximately 1.6- to 1.8-second API latency is noticeable but compatible with a conversational prototype; the displayed frozen-result pages do not measure live inference delay.\par
+
+\pard\s2 5.7\tab Interpretation and Limitations\par
+
+\pard\s0 The project goal was to identify a reliable first-stage router for the NewStart AI minimum viable product. All three methods satisfied this goal for complete documents, while the robustness evaluation favored the plain LLM and LLM+RAG over BERT when identifiers or document regions were removed. Between the two LLM approaches, plain Gemini provided the stronger observed operational tradeoff because it matched RAG's perfect classification performance with lower latency, token use, and estimated cost. BERT nevertheless remains relevant when local deployment, privacy, predictable infrastructure cost, or faster routing is prioritized.\par
+
+\pard\s0 Several limitations restrict the conclusions. The primary results come from one frozen test partition of 99 documents, with only four IRS documents. The evaluation covered documents collected from four agencies and did not formally test unsupported inputs, uncertain cases, user questions, scanned images, OCR errors, or naturally noisy uploads. Perfect LLM scores therefore represent ceiling performance on this dataset rather than general evidence of universal robustness. The same documents were reused across ten transformed conditions, so the 990 cases per method are not 990 independent documents. Data review also identified quality issues, including a placeholder-like extraction and an agency-label mismatch, showing that automated extraction and metadata checks cannot replace substantive document review. Finally, the saved LLM and RAG artifacts support the reported results, but the repository does not contain a committed notebook caller for the underlying run_plain_llm_case and run_llm_rag_case functions; adding a single versioned orchestration entry point would improve reproducibility.\par
+
+\pard\s1 6\tab Conclusion\par
+
+\pard\s0 NewStart AI investigated whether government documents could be classified and routed among USCIS, the California DMV, SSA, and the IRS using a fine-tuned BERT classifier, a prompted Gemini LLM, and Gemini with retrieval-augmented generation. The primary family-aware design reduced leakage risk by keeping related document families in separate partitions and evaluated the same 99 frozen test documents under ten complete, partial, masked, and unmasked text conditions. All three methods achieved 1.0000 accuracy and macro F1 on complete unmasked documents, demonstrating that each approach could support the MVP's initial routing function under the primary condition.\par
+
+\pard\s0 The most significant result was the difference in robustness and efficiency beyond the primary condition. Plain Gemini and Gemini+RAG retained a macro F1 of 1.0000 across all ten conditions, while BERT was perfect in five conditions and reached a minimum macro F1 of 0.9587. RAG changed none of Gemini's 990 predictions but increased mean latency, prompt-token use, and estimated cost. Consequently, plain Gemini was the strongest observed choice when robustness to partial or masked text was prioritized, whereas BERT remained the more attractive foundation for a local, privacy-oriented, and low-latency deployment. The unexpectedly strong LLM performance despite input truncation, BERT's rapid attainment of perfect validation macro F1 at epoch 2, and the absence of any classification benefit from RAG were the principal unexpected findings.\par
+
+\pard\s0 Future work should broaden the dataset to additional agencies, add more IRS examples, and evaluate documents from sources and time periods not represented in the current collection. The router should be tested on unsupported and ambiguous inputs and should include confidence calibration or an abstention mechanism before it is relied upon in practice. Evaluation should also include scanned documents, OCR noise, multilingual content, partial user uploads, and questions rather than only extracted form text. For the broader agentic platform, domain experts should assess the factual accuracy, safety, and usefulness of generated guidance, with privacy protections, audit logging, monitoring, and clear boundaries against legal or benefits advice. Productionization would also require a committed end-to-end evaluation entry point, live latency and load testing, model and prompt versioning, failure handling for external APIs, and ongoing review for agency-form changes.\par
+
+\page
+\pard\s1 Integration Notes (Remove Before Final Submission)\par
+
+\pard\s0\b 1. Test-set size and tense.\b0  In the Introduction, replace the planned held-out sample of 100 documents with the completed family-aware test size of 99 documents and revise future-tense statements such as "will be used" to past tense.\par
+
+\pard\s0\b 2. Unsupported or uncertain inputs.\b0  Do not state that unsupported or uncertain inputs were evaluated unless a separate experiment exists. The reported evaluation used only the four supported agency labels.\par
+
+\pard\s0\b 3. Extraction library and quality statement.\b0  Resolve the inconsistency between pdfplumber and PyMuPDF in the Data Summary using the actual final pipeline. Revise the claim that all extractions were fully valid because the later error analysis identified a placeholder-like extraction.\par
+
+\pard\s0\b 4. Eligible family-aware sample.\b0  Distinguish the collected dataset of 754 documents from the 659 documents eligible for the family-aware experiment after language and quality-control exclusions.\par
+
+\pard\s0\b 5. Table numbering.\b0  The dataset summary is Table 1. Renumber the Methodology training-configuration table as Table 2 so the Results tables remain Tables 3 through 6.\par
+
+\pard\s0\b 6. Primary RAG retrieval policy.\b0  Describe the family-aware RAG policy as a candidate pool of 20 followed by diversified top-5 selection, with no more than two passages from one parent document or effective family. Do not describe the primary family-aware configuration as historical top-3 retrieval.\par
+
+\pard\s0\b 7. Frozen-result provenance.\b0  State that the LLM and LLM+RAG notebooks summarized already-frozen Checkpoint 10 prediction and diagnostic artifacts. They did not rerun Gemini inference or regenerate embeddings.\par
+
+}
