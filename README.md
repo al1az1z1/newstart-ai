@@ -14,8 +14,8 @@ The goal is to evaluate which approach provides the best document classification
 
 The dataset is built from publicly available government documents collected from official agency websites. Crawlers are used to automatically download forms, instructions, and other public documents from sources such as:
 
-* USCIS
-* California DMV
+* U.S. Citizenship and Immigration Services (USCIS)
+* California Department of Motor Vehicles (DMV)
 * Social Security Administration (SSA)
 * Internal Revenue Service (IRS)
 
