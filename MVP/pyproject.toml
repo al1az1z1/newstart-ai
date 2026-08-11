@@ -1,0 +1,23 @@
+[project]
+name = "newstart-ai-mvp"
+version = "0.1.0"
+description = "Self-contained CLI package for the NewStart AI family-aware research pipeline -- no runtime dependency on the original project's src/newstart_ai package."
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["newstart_ai_mvp*"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
