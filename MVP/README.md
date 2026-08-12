@@ -401,6 +401,13 @@ Additional limitations include:
 - The test set contains 99 eligible, family-disjoint documents.
 - The interactive application demonstrates feasibility; its guidance quality was not formally evaluated.
 
+
+## Ethical Data Collection
+
+The dataset includes only publicly available government PDF forms and instructions accessible to the general public. Automated crawlers were used solely where permitted by the website’s terms, privacy policies, and access rules. When automated 
+
+collection was restricted or inappropriate, documents were downloaded manually. No login-protected, private, personal, or sensitive information was accessed or included in the dataset.
+
 ## Authors and Contributions
 
 NewStart AI was developed collaboratively by **Group 3**:

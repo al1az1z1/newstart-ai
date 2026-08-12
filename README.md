@@ -64,6 +64,12 @@ NewStart AI was developed for educational and research purposes. It is not an of
 
 The agency-specific guidance component demonstrates a prototype workflow and was not formally evaluated for factual correctness, safety, completeness, or usefulness.
 
+## Ethical Data Collection
+
+The dataset includes only publicly available government PDF forms and instructions accessible to the general public. Automated crawlers were used solely where permitted by the website’s terms, privacy policies, and access rules. When automated 
+
+collection was restricted or inappropriate, documents were downloaded manually. No login-protected, private, personal, or sensitive information was accessed or included in the dataset.
+
 ## Team
 
 NewStart AI was developed collaboratively by **Group 3**:
